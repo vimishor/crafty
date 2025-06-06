@@ -1,0 +1,72 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.filter.outputs.go }}
+      lua: ${{ steps.filter.outputs.lua }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          # base: 'master'
+          filters: |
+            go:
+              - '**.go'
+              - 'go.mod'
+              - 'go.sum'
+            lua:
+              - '**.lua'
+
+  test-go:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.go == 'true' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu]
+        go: [1.24]
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+          cache: true
+
+      - name: Test Go
+        run: make test-go
+
+  test-lua:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.lua == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+
+      - name: Test Lua
+        run: make test-lua

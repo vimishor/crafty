@@ -1,0 +1,68 @@
+version: "2"
+
+linters:
+  default: none
+  enable:
+    - goconst
+    - gocritic
+    - gocyclo
+    - govet
+    - staticcheck
+    - unconvert
+    - unparam
+    - unused
+  settings:
+    goconst:
+      min-len: 3
+      min-occurrences: 2
+    gocritic:
+      disabled-checks:
+        - ifElseChain
+        - singleCaseSwitch
+    gocyclo:
+      min-complexity: 15
+    staticcheck:
+      checks:
+        - all
+        - -ST1003
+        - -ST1005
+        - -QF1001
+        - -QF1006
+        - -QF1008
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+        - gocyclo
+        - staticcheck
+        - unparam
+        path: (.+)_test\.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+formatters:
+  enable:
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/vimishor
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

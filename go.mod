@@ -1,6 +1,6 @@
 module github.com/vimishor/crafty
 
-go 1.24.2
+go 1.24.4
 
 require (
 	github.com/adrg/xdg v0.5.3
